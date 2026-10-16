@@ -244,14 +244,13 @@
             #success-message h2 { font-size: 2.2rem; }
         }
     </style>
-    
-    <!-- Script da API do YouTube -->
-    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body style="overflow: hidden;">
 
-<!-- PLAYER DO YOUTUBE OCULTO -->
-<div id="youtube-player" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; z-index: -1;"></div>
+<!-- MÚSICA DE FUNDO MP3 -->
+<audio id="bg-music">
+    <source src="musica1.mp3" type="audio/mpeg">
+</audio>
 
 <!-- =========================================
      TELA DE QUIZ (INTRODUÇÃO)
@@ -436,7 +435,7 @@
        LÓGICA DO QUIZ
        ========================================= */
     function removeAcentos(str) {
-        return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
 
     function checkStep1() {
@@ -484,79 +483,54 @@
     }
 
     function finishQuiz() {
-            // TOCA A MÚSICA IMEDIATAMENTE NO CLIQUE (Para o navegador não bloquear)
-            playYouTubeMusic();
+        // Aciona a música exatamente no momento do clique para o navegador não bloquear
+        playBgMusic();
 
-            const intro = document.getElementById('intro-screen');
-            intro.style.opacity = '0';
-            setTimeout(() => {
-                intro.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                document.getElementById('main-site').style.display = 'block';
-            }, 800);
-        }
+        const intro = document.getElementById('intro-screen');
+        intro.style.opacity = '0';
+        setTimeout(() => {
+            intro.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('main-site').style.display = 'block';
+        }, 800);
+    }
 
 
     /* =========================================
-       PLAYLIST DO YOUTUBE
+       PLAYLIST DE MÚSICAS MP3
        ========================================= */
-    const youtubePlaylist = [
-        "fQv-5OuLODE", 
-        "cG1uioTqMxI"  
-    ];
-    
-    let ytPlayer;
-    let currentYtIndex = 0;
+    const bgMusic = document.getElementById('bg-music');
+    const myPlaylist = ["musica1.mp3", "musica2.mp3"];
+    let currentTrack = 0;
 
-    function onYouTubeIframeAPIReady() {
-        ytPlayer = new YT.Player('youtube-player', {
-            height: '1',
-            width: '1',
-            videoId: youtubePlaylist[0],
-            playerVars: {
-                'autoplay': 0,
-                'controls': 0,
-                'showinfo': 0,
-                'rel': 0
-            },
-            events: {
-                'onStateChange': onPlayerStateChange
-            }
+    // Quando uma música acaba, passa para a próxima automaticamente
+    bgMusic.addEventListener('ended', () => {
+        currentTrack++;
+        if (currentTrack >= myPlaylist.length) {
+            currentTrack = 0; // Volta para a primeira se a lista acabar
+        }
+        bgMusic.src = myPlaylist[currentTrack];
+        bgMusic.play();
+    });
+
+    function playBgMusic() {
+        bgMusic.play().catch(() => {
+            console.log("Aguardando interação para tocar a música...");
         });
-    }
-
-    function onPlayerStateChange(event) {
-        if (event.data === YT.PlayerState.ENDED) {
-            currentYtIndex++;
-            if (currentYtIndex >= youtubePlaylist.length) {
-                currentYtIndex = 0; 
-            }
-            ytPlayer.loadVideoById(youtubePlaylist[currentYtIndex]);
-        }
-    }
-
-    function playYouTubeMusic() {
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            ytPlayer.playVideo();
-        }
     }
 
     // Configuração para a Oração
     const voiceMessage = document.getElementById('voice-message');
     
     function playVoiceMessage() {
-        // Pausa o YouTube automaticamente ao dar play na oração
-        if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-            ytPlayer.pauseVideo();
-        }
+        // Pausa a música MP3 automaticamente ao dar play na oração
+        bgMusic.pause();
         voiceMessage.play();
     }
 
-    // Volta a tocar o YouTube quando a oração terminar
+    // Volta a tocar a música MP3 quando a oração terminar
     voiceMessage.addEventListener('ended', () => {
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            ytPlayer.playVideo();
-        }
+        bgMusic.play();
     });
 
     /* =========================================
@@ -581,7 +555,7 @@
     updateCounter();
 
     /* =========================================
-       CONFIGURAÇÃO DAS FOTOS DO LIVRO (DRIVE)
+       CONFIGURAÇÃO DAS FOTOS DO LIVRO
        ========================================= */
     const myPhotos = [
         "https://i.postimg.cc/ZqhGdVGS/27.jpg",
@@ -694,7 +668,6 @@
         });
     }
 
-    /* A mágica que faz o livro sempre abrir certinho, não importa o tamanho da tela */
     function openBook() {
         book.style.transform = "translateX(50%)";
     }
@@ -752,10 +725,8 @@
             document.getElementById('submit-btn').style.display = 'none';
             document.getElementById('modal-text').style.display = 'none';
             
-            // Pausa a música ao revelar o pedido
-            if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-                ytPlayer.pauseVideo();
-            }
+            // Pausa a música ao revelar o pedido final
+            bgMusic.pause();
         } else {
             alert("Senha incorreta. Lembre-se: me peça a senha quando tiver certeza.");
             document.getElementById('password').value = '';
