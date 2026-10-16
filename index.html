@@ -251,7 +251,7 @@
 <body style="overflow: hidden;">
 
 <!-- PLAYER DO YOUTUBE OCULTO -->
-<div id="youtube-player" style="display: none; position: absolute;"></div>
+<div id="youtube-player" style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; z-index: -1;"></div>
 
 <!-- =========================================
      TELA DE QUIZ (INTRODUÇÃO)
@@ -509,8 +509,8 @@
 
     function onYouTubeIframeAPIReady() {
         ytPlayer = new YT.Player('youtube-player', {
-            height: '0',
-            width: '0',
+            height: '1',
+            width: '1',
             videoId: youtubePlaylist[0],
             playerVars: {
                 'autoplay': 0,
