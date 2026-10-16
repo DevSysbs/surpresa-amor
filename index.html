@@ -182,7 +182,7 @@
         .submit-btn { background-color: var(--primary-color); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: background-color 0.3s; }
         .submit-btn:hover { background-color: #ad144b; }
         #success-message { display: none; margin-top: 10px; }
-        #success-message h2 { font-size: 3.5rem; border: none; margin-bottom: 0; animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        #success-message h2 { font-size: 1.6rem; border: none; margin-bottom: 0; animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; line-height: 1.4; color: var(--primary-color); font-family: 'Lora', serif; font-weight: bold; }
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         footer { margin-top: 2rem; padding: 2rem; background: linear-gradient(135deg, #d81b60, #ff4b72); color: white; font-size: 1.2rem; }
@@ -241,7 +241,7 @@
             .modal-content h2 { font-size: 1.8rem !important; }
             .password-input { width: 100%; font-size: 1rem; }
             .submit-btn { width: 100%; }
-            #success-message h2 { font-size: 2.2rem; }
+            #success-message h2 { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -420,7 +420,7 @@
             <br>
             <button class="submit-btn" id="submit-btn" onclick="checkPassword()">Confirmar</button>
             <div id="success-message">
-                <h2>Quer casar comigo? 💍</h2>
+                <h2>Já marquei com Deus, o dia que vou te pedir em Casamento, se prepare, pois no dia 03/06/2027, iremos deixar de ser namorados, e sim noivos. Vou me dedicar e me entregar para prover para nossa familia ❤️</h2>
             </div>
         </div>
     </div>
@@ -431,6 +431,43 @@
 </div>
 
 <script>
+    /* =========================================
+       PLAYLIST DE MÚSICAS MP3 E AUTOPLAY
+       ========================================= */
+    const bgMusic = document.getElementById('bg-music');
+    const myPlaylist = ["musica1.mp3", "musica2.mp3"];
+    let currentTrack = 0;
+
+    // Quando uma música acaba, passa para a próxima automaticamente
+    bgMusic.addEventListener('ended', () => {
+        currentTrack++;
+        if (currentTrack >= myPlaylist.length) {
+            currentTrack = 0; // Volta para a primeira se a lista acabar
+        }
+        bgMusic.src = myPlaylist[currentTrack];
+        bgMusic.play();
+    });
+
+    // Função que tenta tocar a música assim que ela tocar em QUALQUER lugar da tela
+    function startMusicOnFirstInteraction() {
+        bgMusic.play().then(() => {
+            // Se a música tocou com sucesso, removemos o "espião" de clique
+            document.removeEventListener('click', startMusicOnFirstInteraction);
+            document.removeEventListener('touchstart', startMusicOnFirstInteraction);
+        }).catch(() => {
+            // Se o navegador ainda bloquear, ele tenta no próximo clique
+            console.log("Aguardando interação para tocar a música...");
+        });
+    }
+
+    // Fica vigiando o primeiro toque/clique dela na tela (ex: ao clicar para digitar a 1ª data)
+    document.addEventListener('click', startMusicOnFirstInteraction);
+    document.addEventListener('touchstart', startMusicOnFirstInteraction);
+
+    function playBgMusic() {
+        bgMusic.play().catch(() => {});
+    }
+
     /* =========================================
        LÓGICA DO QUIZ
        ========================================= */
@@ -483,7 +520,7 @@
     }
 
     function finishQuiz() {
-        // Aciona a música exatamente no momento do clique para o navegador não bloquear
+        // Tenta garantir que a música já está tocando caso não tenha ido no primeiro clique
         playBgMusic();
 
         const intro = document.getElementById('intro-screen');
@@ -493,30 +530,6 @@
             document.body.style.overflow = 'auto';
             document.getElementById('main-site').style.display = 'block';
         }, 800);
-    }
-
-
-    /* =========================================
-       PLAYLIST DE MÚSICAS MP3
-       ========================================= */
-    const bgMusic = document.getElementById('bg-music');
-    const myPlaylist = ["musica1.mp3", "musica2.mp3"];
-    let currentTrack = 0;
-
-    // Quando uma música acaba, passa para a próxima automaticamente
-    bgMusic.addEventListener('ended', () => {
-        currentTrack++;
-        if (currentTrack >= myPlaylist.length) {
-            currentTrack = 0; // Volta para a primeira se a lista acabar
-        }
-        bgMusic.src = myPlaylist[currentTrack];
-        bgMusic.play();
-    });
-
-    function playBgMusic() {
-        bgMusic.play().catch(() => {
-            console.log("Aguardando interação para tocar a música...");
-        });
     }
 
     // Configuração para a Oração
@@ -718,7 +731,7 @@
 
     function checkPassword() {
         const pass = document.getElementById('password').value;
-        const correctPassword = "nossadata"; 
+        const correctPassword = "berju"; 
         if(pass.toLowerCase().trim() === correctPassword.toLowerCase()) {
             document.getElementById('success-message').style.display = 'block';
             document.getElementById('password').style.display = 'none';
